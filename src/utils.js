@@ -137,6 +137,193 @@ async function requestGraph(endpoint, subgraphName, userOptions) {
   return response.data;
 }
 
+async function requestGraphLand(endpoint, subgraphName, userOptions) {
+  const options = checkOptions(userOptions, {
+    query: {
+      type: 'string',
+    },
+    variables: {
+      type: 'object',
+      default: {},
+    },
+  });
+
+  const query = options.query.replace(/\s\s+/g, ' ');
+
+  const variables =
+    Object.keys(options.variables).length === 0 ? undefined : options.variables;
+
+  const response = await request(endpoint, {
+    path: ['subgraphs', 'name', subgraphName],
+    method: 'POST',
+    data: {
+      query,
+      variables,
+    },
+    isTrailingSlash: false,
+  });
+
+  return response.data;
+}
+
+export async function requestIndexedDB(query, parameters) {
+  let response;
+
+  switch (query) {
+    case 'activity_stream':
+      response = getNotificationsStatus(parameters);
+      break;
+    case 'organization_status':
+      response = getOrganizationStatus(parameters);
+      break;
+    case 'safe_addresses':
+      response = getSafeAddresses(parameters);
+      break;
+    case 'balances':
+      response = getBalancesStatus(parameters);
+      break;
+    case 'trust_network':
+      response = getTrustNetworkStatus(parameters);
+      break;
+    case 'trust_limits':
+      response = getTrustLimitsStatus(parameters);
+      break;
+  }
+  return response;
+}
+
+function getNotificationsStatus(DB_type, parameters) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        notifications(${parameters}) {
+          id
+          transactionHash
+          safeAddress
+          type
+          time
+          trust {
+            user
+            canSendTo
+            limitPercentage
+          }
+          transfer {
+            from
+            to
+            amount
+          }
+          hubTransfer {
+            from
+            to
+            amount
+          }
+          ownership {
+            adds
+            removes
+          }
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
+function getOrganizationStatus(DB_type, ownerAddress) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        user(id: "${ownerAddress.toLowerCase()}") {
+          id,
+          safes {
+            id
+            organization
+          }
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
+function getSafeAddresses(DB_type, options) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        user(id: "${options.ownerAddress.toLowerCase()}") {
+          safeAddresses,
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
+function getBalancesStatus(safeAddress) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        safe(id: "${safeAddress.toLowerCase()}") {
+          balances {
+            token {
+              id
+            }
+            amount
+          }
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
+function getTrustNetworkStatus(safeAddress) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        trusts(where: { userAddress: "${safeAddress}" }) {
+          id
+          limitPercentage
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
+function getTrustLimitsStatus(safeAddress) {
+  if (process.env.DB_TYPE == 'graph') {
+    const query = {
+      query: `{
+        safe(id: "${safeAddress}") {
+          outgoing {
+            limitPercentage
+            userAddress
+            canSendToAddress
+          }
+          incoming {
+            limitPercentage
+            userAddress
+            user {
+              outgoing {
+                canSendToAddress
+                limitPercentage
+              }
+            }
+            canSendToAddress
+          }
+        }
+      }`,
+    };
+    return requestGraph(query);
+  } else {
+  }
+}
+
 async function estimateTransactionCosts(
   endpoint,
   {
@@ -162,7 +349,6 @@ async function estimateTransactionCosts(
     },
   });
 }
-
 /**
  * Manages transaction queue to finalize currently running tasks and starts the
  * next one when ready.

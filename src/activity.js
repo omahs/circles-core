@@ -4,6 +4,8 @@ import checkAccount from '~/common/checkAccount';
 import checkOptions from '~/common/checkOptions';
 import createSymbolObject from '~/common/createSymbolObject';
 
+import { requestIndexedDB } from '~/utils';
+
 const DEFAULT_LIMIT = 20;
 const DEFAULT_TIMESTAMP = 0;
 
@@ -112,36 +114,40 @@ export default function createActivityModule(web3, contracts, utils) {
             }
         `;
 
-        const response = await utils.requestGraph({
-          query: `{
-            notifications(${parameters}) {
-              id
-              transactionHash
-              safeAddress
-              type
-              time
-              trust {
-                user
-                canSendTo
-                limitPercentage
-              }
-              transfer {
-                from
-                to
-                amount
-              }
-              hubTransfer {
-                from
-                to
-                amount
-              }
-              ownership {
-                adds
-                removes
-              }
-            }
-          }`,
-        });
+        const response = await utils.requestIndexedDB(
+          'activity_stream',
+          parameters,
+        );
+        // const response = await utils.requestGraph({
+        //   query: `{
+        //     notifications(${parameters}) {
+        //       id
+        //       transactionHash
+        //       safeAddress
+        //       type
+        //       time
+        //       trust {
+        //         user
+        //         canSendTo
+        //         limitPercentage
+        //       }
+        //       transfer {
+        //         from
+        //         to
+        //         amount
+        //       }
+        //       hubTransfer {
+        //         from
+        //         to
+        //         amount
+        //       }
+        //       ownership {
+        //         adds
+        //         removes
+        //       }
+        //     }
+        //   }`,
+        // });
 
         if (
           !response ||

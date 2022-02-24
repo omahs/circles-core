@@ -1,5 +1,6 @@
 import checkAccount from '~/common/checkAccount';
 import checkOptions from '~/common/checkOptions';
+import { requestIndexedDB } from '~/utils';
 
 const DEFAULT_USER_LIMIT_PERCENTAGE = 50;
 const DEFAULT_ORG_LIMIT_PERCENTAGE = 100;
@@ -49,14 +50,18 @@ export default function createTrustModule(web3, contracts, utils) {
 
       const safeAddress = options.safeAddress.toLowerCase();
 
-      const response = await utils.requestGraph({
-        query: `{
-          trusts(where: { userAddress: "${safeAddress}" }) {
-            id
-            limitPercentage
-          }
-        }`,
-      });
+      const response = await utils.requestIndexedDB(
+        'trust_network',
+        safeAddress,
+      );
+      // const response = await utils.requestGraph({
+      //   query: `{
+      //     trusts(where: { userAddress: "${safeAddress}" }) {
+      //       id
+      //       limitPercentage
+      //     }
+      //   }`,
+      // });
 
       if (!response) {
         return {
@@ -98,28 +103,32 @@ export default function createTrustModule(web3, contracts, utils) {
 
       const safeAddress = options.safeAddress.toLowerCase();
 
-      const response = await utils.requestGraph({
-        query: `{
-          safe(id: "${safeAddress}") {
-            outgoing {
-              limitPercentage
-              userAddress
-              canSendToAddress
-            }
-            incoming {
-              limitPercentage
-              userAddress
-              user {
-                outgoing {
-                  canSendToAddress
-                  limitPercentage
-                }
-              }
-              canSendToAddress
-            }
-          }
-        }`,
-      });
+      const response = await utils.requestIndexedDB(
+        'trust_limits',
+        safeAddress,
+      );
+      // const response = await utils.requestGraph({
+      //   query: `{
+      //     safe(id: "${safeAddress}") {
+      //       outgoing {
+      //         limitPercentage
+      //         userAddress
+      //         canSendToAddress
+      //       }
+      //       incoming {
+      //         limitPercentage
+      //         userAddress
+      //         user {
+      //           outgoing {
+      //             canSendToAddress
+      //             limitPercentage
+      //           }
+      //         }
+      //         canSendToAddress
+      //       }
+      //     }
+      //   }`,
+      // });
 
       if (!response || response.safe === null) {
         // Fail silently with empty response / no trust connections when Safe

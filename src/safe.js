@@ -3,6 +3,7 @@ import { SAFE_THRESHOLD, SENTINEL_ADDRESS } from '~/common/constants';
 import checkAccount from '~/common/checkAccount';
 import checkOptions from '~/common/checkOptions';
 import { getSafeContract } from '~/common/getContracts';
+import { requestIndexedDB } from '~/utils';
 
 /**
  * Helper method to receive a list of all Gnosis Safe owners.
@@ -314,13 +315,14 @@ export default function createSafeModule(web3, contracts, utils) {
         },
       });
 
-      const response = await utils.requestGraph({
-        query: `{
-          user(id: "${options.ownerAddress.toLowerCase()}") {
-            safeAddresses,
-          }
-        }`,
-      });
+      const response = await utils.requestIndexedDB('safe_addresses', options);
+      // const response = await utils.requestGraph({
+      //   query: `{
+      //     user(id: "${options.ownerAddress.toLowerCase()}") {
+      //       safeAddresses,
+      //     }
+      //   }`,
+      // });
 
       if (!response || !response.user) {
         return [];
