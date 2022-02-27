@@ -137,39 +137,10 @@ async function requestGraph(endpoint, subgraphName, userOptions) {
   return response.data;
 }
 
-async function requestGraphLand(endpoint, subgraphName, userOptions) {
-  const options = checkOptions(userOptions, {
-    query: {
-      type: 'string',
-    },
-    variables: {
-      type: 'object',
-      default: {},
-    },
-  });
-
-  const query = options.query.replace(/\s\s+/g, ' ');
-
-  const variables =
-    Object.keys(options.variables).length === 0 ? undefined : options.variables;
-
-  const response = await request(endpoint, {
-    path: ['subgraphs', 'name', subgraphName],
-    method: 'POST',
-    data: {
-      query,
-      variables,
-    },
-    isTrailingSlash: false,
-  });
-
-  return response.data;
-}
-
-export async function requestIndexedDB(query, parameters) {
+async function requestIndexedDB(data, parameters) {
   let response;
 
-  switch (query) {
+  switch (data) {
     case 'activity_stream':
       response = getNotificationsStatus(parameters);
       break;
@@ -607,6 +578,18 @@ export default function createUtilsModule(web3, contracts, globalOptions) {
      */
     requestGraph: async (userOptions) => {
       return requestGraph(graphNodeEndpoint, subgraphName, userOptions);
+    },
+
+    /**
+     * Query the Graph Node or Land Graph Node with GraphQL.
+     *
+     * @namespace core.utils.requestIndexedDB
+     *
+     * @param {string} data - data to obtain
+     * @param {Object} parameters - parameters needed for query
+     */
+    requestIndexedDB: async (data, parameters) => {
+      return requestIndexedDB(data, parameters);
     },
 
     /**

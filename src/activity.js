@@ -4,8 +4,6 @@ import checkAccount from '~/common/checkAccount';
 import checkOptions from '~/common/checkOptions';
 import createSymbolObject from '~/common/createSymbolObject';
 
-import { requestIndexedDB } from '~/utils';
-
 const DEFAULT_LIMIT = 20;
 const DEFAULT_TIMESTAMP = 0;
 
@@ -118,6 +116,7 @@ export default function createActivityModule(web3, contracts, utils) {
           'activity_stream',
           parameters,
         );
+        // TODO: remove just for reference
         // const response = await utils.requestGraph({
         //   query: `{
         //     notifications(${parameters}) {

@@ -1,6 +1,5 @@
 import checkAccount from '~/common/checkAccount';
 import checkOptions from '~/common/checkOptions';
-import { requestIndexedDB } from '~/utils';
 
 const DEFAULT_USER_LIMIT_PERCENTAGE = 50;
 const DEFAULT_ORG_LIMIT_PERCENTAGE = 100;
@@ -54,6 +53,7 @@ export default function createTrustModule(web3, contracts, utils) {
         'trust_network',
         safeAddress,
       );
+      // TODO: remove just for reference
       // const response = await utils.requestGraph({
       //   query: `{
       //     trusts(where: { userAddress: "${safeAddress}" }) {
@@ -107,6 +107,7 @@ export default function createTrustModule(web3, contracts, utils) {
         'trust_limits',
         safeAddress,
       );
+      // TODO: remove just for reference
       // const response = await utils.requestGraph({
       //   query: `{
       //     safe(id: "${safeAddress}") {

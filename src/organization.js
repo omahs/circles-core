@@ -5,8 +5,6 @@ import { ZERO_ADDRESS } from '~/common/constants';
 import { getOwners } from '~/safe';
 import { getTokenContract } from '~/common/getContracts';
 import loop from '~/common/loop';
-import { requestIndexedDB } from '~/utils';
-
 /**
  * Organization submodule to deploy and check organization accounts.
  *
@@ -263,6 +261,7 @@ export default function createOrganizationModule(web3, contracts, utils) {
 
       const promises = owners.map((ownerAddress) => {
         return utils.requestIndexedDB('organization_status', ownerAddress);
+        // TODO: remove just for reference
         // return utils.requestGraph({
         //   query: `{
         //     user(id: "${ownerAddress.toLowerCase()}") {
