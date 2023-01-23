@@ -66,7 +66,7 @@ This library provides common methods for JavaScript clients and wallets to inter
 - Interact with [`circles-contracts`] and off-chain services like [`safe-relay-service`], [`graph`] and [`circles-api`]
 - Register and maintain user accounts and organizations
 - Create and search off-chain data like transfer descriptions, usernames and profile pictures
-- Trust other users in the network and retreive trust network
+- Trust other users in the network and retrieve trust network
 - List owned Circles tokens and their current balance
 - Show last activities like transfers, trusts and Safe ownership changes
 - Calculate transitive transfer steps to send Circles
